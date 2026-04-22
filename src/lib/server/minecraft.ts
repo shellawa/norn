@@ -1,24 +1,42 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process"
 import EventEmitter from "node:events"
-import { McServerStatus } from "$lib/types"
+import { type McServerInfo, McServerStatus } from "$lib/types"
+import path from "node:path"
+import { appPaths } from "./config"
 
 class MinecraftServer extends EventEmitter {
+  readonly info: McServerInfo
   private status = McServerStatus.Stopped
   private process: ChildProcessWithoutNullStreams | null = null
   private logs: string[] = []
   private readonly MAX_LOGS_LENGTH = 1000
 
-  constructor() {
+  constructor(info: McServerInfo) {
     super()
+    this.info = info
   }
 
   start() {
     if (this.status != McServerStatus.Stopped) return
 
-    this.process = spawn("java", ["-Xmx2G", "-jar", "server.jar", "nogui"], { cwd: "servers/test" })
+    this.status = McServerStatus.Starting
+    this.emit("status", this.status)
+
+    const serverPath = path.join(appPaths.servers, this.info.id)
+    this.process = spawn("java", ["-Xmx2G", "-jar", this.info.jarPath, "nogui"], { cwd: serverPath })
 
     this.process.stdout.on("data", this.pushLog)
     this.process.stderr.on("data", this.pushLog)
+    this.process.on("error", (error) => {
+      this.status = McServerStatus.Stopped
+      this.pushLog(Buffer.from(`Failed to start server: ${error.message}\n`))
+      this.process = null
+      this.emit("status", this.status)
+    })
+    this.process.on("spawn", () => {
+      this.status = McServerStatus.Running
+      this.emit("status", this.status)
+    })
 
     this.process.on("close", (code) => {
       this.status = McServerStatus.Stopped
@@ -27,9 +45,6 @@ class MinecraftServer extends EventEmitter {
       this.process = null
       this.emit("status", this.status)
     })
-
-    this.status = McServerStatus.Running
-    this.emit("status", this.status)
   }
 
   stop() {
@@ -47,7 +62,7 @@ class MinecraftServer extends EventEmitter {
     this.emit("log", text)
   }
 
-  getLogsHistory() {
+  getLogs() {
     return this.logs
   }
 
@@ -56,4 +71,4 @@ class MinecraftServer extends EventEmitter {
   }
 }
 
-export const mcServer = new MinecraftServer()
+export { MinecraftServer }

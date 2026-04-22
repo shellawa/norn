@@ -4,3 +4,16 @@ export enum McServerStatus {
   Running = "Running",
   Stopping = "Stopping"
 }
+
+export type McServerInfo = {
+  id: string
+  name: string
+  jarPath: string
+  createdAt?: string
+}
+
+export type McServerState = {
+  info: McServerInfo
+  status: McServerStatus
+  logs: string[]
+}

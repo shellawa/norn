@@ -5,7 +5,7 @@
   import * as Sidebar from "$lib/components/shadcn-svelte/sidebar/index.js"
   import AppSidebar from "$lib/components/shadcn-svelte/app-sidebar.svelte"
 
-  let { children } = $props()
+  let { children, data } = $props()
 </script>
 
 <svelte:head>
@@ -13,10 +13,11 @@
 </svelte:head>
 
 <Sidebar.Provider>
-  <AppSidebar />
+  <AppSidebar servers={data.servers} />
   <div class="h-full w-full space-y-4">
-    <nav class="flex h-6 w-full items-center border-b py-6">
+    <nav class="flex h-6 w-full items-center justify-between border-b px-4 py-6">
       <Sidebar.Trigger />
+      <div class="text-sm text-muted-foreground">{data.servers?.length ?? 0} servers</div>
     </nav>
     {@render children?.()}
   </div>
