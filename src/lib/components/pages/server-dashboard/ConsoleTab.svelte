@@ -4,13 +4,16 @@
   import type { McServerState } from "$lib/types"
   import { Terminal } from "lucide-svelte"
 
+  let { serverState }: { serverState: McServerState } = $props()
+
   let commandInput = $state("")
-  let handleCommand = () => {
-    console.log(commandInput)
+  let handleCommand = async () => {
+    await fetch(`/api/servers/${encodeURIComponent(serverState.info.id)}/console-command`, {
+      method: "POST",
+      body: JSON.stringify({ cmd: commandInput })
+    })
     commandInput = ""
   }
-
-  let { serverState }: { serverState: McServerState } = $props()
 </script>
 
 <Tabs.Content value="console" class="outline-none">
