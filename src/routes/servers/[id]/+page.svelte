@@ -2,17 +2,28 @@
   import * as Tabs from "$lib/components/shadcn-svelte/tabs"
   import * as Card from "$lib/components/shadcn-svelte/card"
   import { Button } from "$lib/components/shadcn-svelte/button"
-  import { source } from "sveltekit-sse"
-  import type { McServerStatus } from "$lib/types"
+  import { Badge } from "$lib/components/shadcn-svelte/badge"
+  import { source, type Source } from "sveltekit-sse"
+  import { McServerStatus } from "$lib/types"
   import { onMount } from "svelte"
+  import { Play, Square } from "lucide-svelte"
+  import Overview from "$lib/components/pages/server-dashboard/OverviewTab.svelte"
+  import Console from "$lib/components/pages/server-dashboard/ConsoleTab.svelte"
 
   let { data } = $props()
 
   // svelte-ignore state_referenced_locally
   let serverState = $state(structuredClone(data.serverState))
 
+  let connection: Source
   onMount(() => {
-    const connection = source(`/api/servers/${encodeURIComponent(serverState.info.id)}/stream`)
+    connection = source(`/api/servers/${encodeURIComponent(serverState.info.id)}/stream`, {
+      close({ connect }) {
+        console.log("reconnecting sse")
+        connect()
+      }
+    })
+
     connection.select("log").subscribe((val) => {
       if (val) serverState.logs.push(val)
     })
@@ -28,58 +39,66 @@
   const stopServer = async () => {
     await fetch(`/api/servers/${encodeURIComponent(serverState.info.id)}/stop`)
   }
+
+  let statusVariant: "default" | "destructive" | "secondary" = $derived(
+    serverState.status === McServerStatus.Running
+      ? "default"
+      : serverState.status === McServerStatus.Stopped
+        ? "destructive"
+        : "secondary"
+  )
 </script>
 
-<main class="mx-auto w-full max-w-7xl space-y-4 px-6">
-  <div class="space-y-1">
-    <div class="text-2xl font-semibold">{serverState.info.name}</div>
-  </div>
-  <Tabs.Root value="overview">
-    <Card.Root class="flex w-fit items-center p-0.75">
-      <Tabs.List class="bg-transparent">
-        <Tabs.Trigger class="w-32" value="overview">Overview</Tabs.Trigger>
-        <Tabs.Trigger class="w-32" value="console">Console</Tabs.Trigger>
-        <Tabs.Trigger class="w-32" value="file">File</Tabs.Trigger>
-        <Tabs.Trigger class="w-32" value="config">Config</Tabs.Trigger>
-      </Tabs.List>
-    </Card.Root>
-    <Tabs.Content value="overview">
-      <div class="space-y-3">
-        <div class="flex gap-2">
-          <Button onclick={startServer}>Start</Button>
-          <Button onclick={stopServer}>Stop</Button>
-        </div>
-        <div>Status: {serverState.status}</div>
-        <div class="rounded-lg border bg-card">
-          <div class="max-h-150 space-y-0.5 overflow-scroll p-4 font-mono text-sm">
-            {#if serverState.logs.length}
-              {#each serverState.logs as line}
-                <div>{line}</div>
-              {/each}
-            {:else}
-              <div class="text-muted-foreground">No logs yet.</div>
-            {/if}
-          </div>
-        </div>
+<main class="mx-auto w-full max-w-7xl space-y-6 p-6">
+  <div class="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+    <div>
+      <h1 class="text-3xl font-bold tracking-tight">{serverState.info.name}</h1>
+      <div class="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+        <span>Current Status:</span>
+        <Badge variant={statusVariant} class="capitalize">
+          {serverState.status || "Unknown"}
+        </Badge>
       </div>
-    </Tabs.Content>
-    <Tabs.Content value="console">
+    </div>
+
+    <div class="flex items-center gap-2">
+      <Button onclick={startServer} variant="default" size="sm">
+        <Play class="mr-2 h-4 w-4" /> Start Server
+      </Button>
+      <Button onclick={stopServer} variant="destructive" size="sm">
+        <Square class="mr-2 h-4 w-4" /> Stop Server
+      </Button>
+    </div>
+  </div>
+
+  <Tabs.Root value="overview" class="space-y-6">
+    <Tabs.List class="grid w-full grid-cols-4 bg-card md:inline-grid md:w-auto">
+      <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
+      <Tabs.Trigger value="console">Console</Tabs.Trigger>
+      <Tabs.Trigger value="file">Files</Tabs.Trigger>
+      <Tabs.Trigger value="config">Configuration</Tabs.Trigger>
+    </Tabs.List>
+
+    <Overview {serverState} />
+
+    <Console {serverState} />
+
+    <Tabs.Content value="file" class="outline-none">
       <Card.Root>
         <Card.Header>
-          <Card.Title>Console</Card.Title>
+          <Card.Title>File Manager</Card.Title>
         </Card.Header>
-        <Card.Content class="space-y-0.5 font-mono text-sm">
-          {#if serverState.logs.length}
-            {#each serverState.logs as line}
-              <div>{line}</div>
-            {/each}
-          {:else}
-            <div class="text-muted-foreground">No logs yet.</div>
-          {/if}
-        </Card.Content>
+        <Card.Content>File here</Card.Content>
       </Card.Root>
     </Tabs.Content>
-    <Tabs.Content value="file">File here</Tabs.Content>
-    <Tabs.Content value="config">Config here</Tabs.Content>
+
+    <Tabs.Content value="config" class="outline-none">
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Server Configuration</Card.Title>
+        </Card.Header>
+        <Card.Content>Config here</Card.Content>
+      </Card.Root>
+    </Tabs.Content>
   </Tabs.Root>
 </main>
