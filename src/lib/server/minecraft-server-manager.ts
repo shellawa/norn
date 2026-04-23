@@ -1,6 +1,5 @@
 import { MinecraftServer } from "$lib/server/minecraft"
 import { type McServerInfo, type McServerState } from "$lib/types"
-import { mkdirSync } from "node:fs"
 import { serverDb } from "./db"
 
 class MinecraftServerManager {
