@@ -14,12 +14,47 @@
     })
     commandInput = ""
   }
+
+  let scrollContainer: HTMLDivElement | undefined = $state()
+  let isAutoScrollEnabled = true
+
+  const handleScroll = () => {
+    if (!scrollContainer) return
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainer
+    isAutoScrollEnabled = Math.abs(scrollHeight - clientHeight - scrollTop) < 10
+  }
+
+  const scrollToBottom = () => {
+    if (isAutoScrollEnabled && scrollContainer) {
+      scrollContainer.scrollTop = scrollContainer.scrollHeight
+    }
+  }
+
+  $effect(() => {
+    serverState.logs.length
+    scrollToBottom()
+  })
+
+  $effect(() => {
+    if (!scrollContainer) return
+    const observer = new ResizeObserver(() => {
+      scrollToBottom()
+    })
+
+    observer.observe(scrollContainer)
+
+    return () => observer.disconnect()
+  })
 </script>
 
 <Tabs.Content value="console" class="outline-none">
   <Card.Root class="flex flex-col gap-0 overflow-hidden border bg-transparent pt-4 pb-3">
     <Card.Content class="p-0">
-      <div class="h-112.5 space-y-1 overflow-y-auto px-4 font-mono text-sm">
+      <div
+        bind:this={scrollContainer}
+        onscroll={handleScroll}
+        class="h-112.5 space-y-1 overflow-y-auto px-4 font-mono text-sm"
+      >
         {#if serverState.logs.length}
           {#each serverState.logs as line}
             <div class="wrap-break-word">{line}</div>

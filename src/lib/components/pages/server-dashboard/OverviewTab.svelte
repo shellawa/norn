@@ -12,6 +12,37 @@
   }
 
   let { serverState }: { serverState: McServerState } = $props()
+
+  let scrollContainer: HTMLDivElement | undefined = $state()
+  let isAutoScrollEnabled = true
+
+  const handleScroll = () => {
+    if (!scrollContainer) return
+    const { scrollTop, scrollHeight, clientHeight } = scrollContainer
+    isAutoScrollEnabled = Math.abs(scrollHeight - clientHeight - scrollTop) < 10
+  }
+
+  const scrollToBottom = () => {
+    if (isAutoScrollEnabled && scrollContainer) {
+      scrollContainer.scrollTop = scrollContainer.scrollHeight
+    }
+  }
+
+  $effect(() => {
+    serverState.logs.length
+    scrollToBottom()
+  })
+
+  $effect(() => {
+    if (!scrollContainer) return
+    const observer = new ResizeObserver(() => {
+      scrollToBottom()
+    })
+
+    observer.observe(scrollContainer)
+
+    return () => observer.disconnect()
+  })
 </script>
 
 <Tabs.Content value="overview" class="space-y-4 outline-none">
@@ -84,7 +115,11 @@
       </Card.Header>
       <Card.Content>
         <div class="flex h-62.5 flex-col rounded-md bg-background p-4 shadow-inner">
-          <div class="flex-1 space-y-1 overflow-y-auto font-mono text-xs">
+          <div
+            bind:this={scrollContainer}
+            onscroll={handleScroll}
+            class="flex-1 space-y-1 overflow-y-auto font-mono text-xs"
+          >
             {#if serverState.logs.length}
               {#each serverState.logs as line}
                 <div class="wrap-break-word">{line}</div>
