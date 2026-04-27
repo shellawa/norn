@@ -17,3 +17,18 @@ export type McServerState = {
   status: McServerStatus
   logs: string[]
 }
+
+export type FileItem = {
+  name: string
+  type: "file" | "directory"
+  size?: number
+  lastModified: number
+  permissions: number
+}
+
+export type FileManagerDialogState = {
+  viewer: { open: boolean; name: string; content: string }
+  newFolder: { open: boolean; name: string }
+  delete: { open: boolean; item: FileItem | null }
+  confirmView: { open: boolean; item: FileItem | null }
+}

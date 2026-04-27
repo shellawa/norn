@@ -1,8 +1,8 @@
 import { error } from "@sveltejs/kit"
-import type { PageServerLoad } from "./$types"
+import type { LayoutServerLoad } from "./$types"
 import type { McServerState } from "$lib/types"
 
-export const load: PageServerLoad = async ({ fetch, params }) => {
+export const load: LayoutServerLoad = async ({ fetch, params }) => {
   const res = await fetch(`/api/servers/${encodeURIComponent(params.id)}`)
   if (res.status != 200) error(res.status)
 

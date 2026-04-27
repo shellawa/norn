@@ -1,19 +1,21 @@
 <script lang="ts">
   import * as Tabs from "$lib/components/shadcn-svelte/tabs"
-  import * as Card from "$lib/components/shadcn-svelte/card"
   import { Button } from "$lib/components/shadcn-svelte/button"
   import { Badge } from "$lib/components/shadcn-svelte/badge"
   import { source, type Source } from "sveltekit-sse"
   import { McServerStatus } from "$lib/types"
-  import { onMount } from "svelte"
+  import { onMount, setContext } from "svelte"
   import { Play, Square } from "lucide-svelte"
-  import Overview from "$lib/components/panel/tabs/OverviewTab.svelte"
-  import Console from "$lib/components/panel/tabs/ConsoleTab.svelte"
+  import { page } from "$app/state"
+  import { goto } from "$app/navigation"
 
-  let { data } = $props()
+  let { data, children } = $props()
 
   // svelte-ignore state_referenced_locally
-  let serverState = $state(structuredClone(data.serverState))
+  const serverState = $state(structuredClone(data.serverState))
+  setContext("serverState", serverState)
+
+  const currentRoute = page.url.pathname.split("/").at(-1)
 
   let connection: Source
   onMount(() => {
@@ -71,34 +73,15 @@
     </div>
   </div>
 
-  <Tabs.Root value="overview" class="space-y-6">
+  <Tabs.Root value={currentRoute} class="space-y-6">
     <Tabs.List class="grid w-full grid-cols-4 bg-card md:inline-grid md:w-auto">
-      <Tabs.Trigger value="overview">Overview</Tabs.Trigger>
-      <Tabs.Trigger value="console">Console</Tabs.Trigger>
-      <Tabs.Trigger value="file">Files</Tabs.Trigger>
-      <Tabs.Trigger value="config">Configuration</Tabs.Trigger>
+      {@const serverRoot = `/servers/${serverState.info.id}/`}
+      <Tabs.Trigger onclick={() => goto(serverRoot + "overview")} value="overview">Overview</Tabs.Trigger>
+      <Tabs.Trigger onclick={() => goto(serverRoot + "console")} value="console">Console</Tabs.Trigger>
+      <Tabs.Trigger onclick={() => goto(serverRoot + "file")} value="file">Files</Tabs.Trigger>
+      <Tabs.Trigger onclick={() => goto(serverRoot + "config")} value="config">Configuration</Tabs.Trigger>
     </Tabs.List>
-
-    <Overview {serverState} />
-
-    <Console {serverState} />
-
-    <Tabs.Content value="file" class="outline-none">
-      <Card.Root>
-        <Card.Header>
-          <Card.Title>File Manager</Card.Title>
-        </Card.Header>
-        <Card.Content>File here</Card.Content>
-      </Card.Root>
-    </Tabs.Content>
-
-    <Tabs.Content value="config" class="outline-none">
-      <Card.Root>
-        <Card.Header>
-          <Card.Title>Server Configuration</Card.Title>
-        </Card.Header>
-        <Card.Content>Config here</Card.Content>
-      </Card.Root>
-    </Tabs.Content>
   </Tabs.Root>
+
+  {@render children?.()}
 </main>
