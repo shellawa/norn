@@ -7,8 +7,8 @@
   import { McServerStatus } from "$lib/types"
   import { onMount } from "svelte"
   import { Play, Square } from "lucide-svelte"
-  import Overview from "$lib/components/pages/server-dashboard/OverviewTab.svelte"
-  import Console from "$lib/components/pages/server-dashboard/ConsoleTab.svelte"
+  import Overview from "$lib/components/panel/tabs/OverviewTab.svelte"
+  import Console from "$lib/components/panel/tabs/ConsoleTab.svelte"
 
   let { data } = $props()
 
