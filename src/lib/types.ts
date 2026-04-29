@@ -9,6 +9,9 @@ export type McServerInfo = {
   id: string
   name: string
   jarPath: string
+  minMem?: string
+  maxMem?: string
+  jvmArgs?: string
   createdAt?: string
 }
 

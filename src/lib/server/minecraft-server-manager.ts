@@ -1,5 +1,5 @@
 import { MinecraftServer } from "$lib/server/minecraft"
-import { type McServerInfo, type McServerState } from "$lib/types"
+import { type McServerState } from "$lib/types"
 import { serverDb } from "./db"
 
 class MinecraftServerManager {

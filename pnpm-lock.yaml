@@ -25,8 +25,8 @@ importers:
         specifier: 3.12.1
         version: 3.12.1
       '@lucide/svelte':
-        specifier: ^1.11.0
-        version: 1.11.0(svelte@5.55.4)
+        specifier: ^1.14.0
+        version: 1.14.0(svelte@5.55.4)
       '@sveltejs/adapter-node':
         specifier: ^5.5.4
         version: 5.5.4(@sveltejs/kit@2.57.1(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.55.4)(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)))(svelte@5.55.4)(typescript@5.9.3)(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)))
@@ -304,8 +304,8 @@ packages:
   '@lezer/lr@1.4.10':
     resolution: {integrity: sha512-rnCpTIBafOx4mRp43xOxDJbFipJm/c0cia/V5TiGlhmMa+wsSdoGmUN3w5Bqrks/09Q/D4tNAmWaT8p6NRi77A==}
 
-  '@lucide/svelte@1.11.0':
-    resolution: {integrity: sha512-4I9b+RuxIf8OkGG883bIYDIXjqVOH0ClgrB0j+jI6CrzEziroEwxiubQwW2xKT3esdJcRVTtW9RtCQM9D+r+ew==}
+  '@lucide/svelte@1.14.0':
+    resolution: {integrity: sha512-MVuP5VRCBQa2OaIpaRbuEV4k5OV2dy9MyxA6Tf4Sz/IN0v3zzUU72ObHc9r2Zn/wSMXDg6lLrHrczqI7w7gCzQ==}
     peerDependencies:
       svelte: ^5
 
@@ -1324,7 +1324,7 @@ snapshots:
     dependencies:
       '@lezer/common': 1.5.2
 
-  '@lucide/svelte@1.11.0(svelte@5.55.4)':
+  '@lucide/svelte@1.14.0(svelte@5.55.4)':
     dependencies:
       svelte: 5.55.4
 

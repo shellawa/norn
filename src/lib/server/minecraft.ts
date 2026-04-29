@@ -23,7 +23,13 @@ class MinecraftServer extends EventEmitter {
     this.emit("status", this.status)
 
     const serverPath = path.join(appPaths.servers, this.info.id)
-    this.process = spawn("java", ["-Xmx2G", "-jar", this.info.jarPath, "nogui"], { cwd: serverPath })
+    const memoryArgs = [`-Xms${this.info.minMem ?? "1024M"}`, `-Xmx${this.info.maxMem ?? "4096M"}`]
+    const extraJvmArgs = (this.info.jvmArgs ?? "")
+      .trim()
+      .split(/\s+/)
+      .filter((x) => x.length > 0)
+    const javaArgs = [...memoryArgs, ...extraJvmArgs, "-jar", this.info.jarPath, "nogui"]
+    this.process = spawn("java", javaArgs, { cwd: serverPath })
 
     this.process.stdout.on("data", this.pushLog)
     this.process.stderr.on("data", this.pushLog)

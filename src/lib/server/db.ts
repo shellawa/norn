@@ -8,9 +8,21 @@ db.exec(`
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     jarPath TEXT NOT NULL,
+    minMem TEXT NOT NULL DEFAULT '1024M',
+    maxMem TEXT NOT NULL DEFAULT '4096M',
+    jvmArgs TEXT NOT NULL DEFAULT '',
     createdAt TEXT NOT NULL
   )
 `)
+try {
+  db.exec("ALTER TABLE servers ADD COLUMN minMem TEXT NOT NULL DEFAULT '1024M'")
+} catch {}
+try {
+  db.exec("ALTER TABLE servers ADD COLUMN maxMem TEXT NOT NULL DEFAULT '4096M'")
+} catch {}
+try {
+  db.exec("ALTER TABLE servers ADD COLUMN jvmArgs TEXT NOT NULL DEFAULT ''")
+} catch {}
 
 const serverDb = {
   listServers(): McServerInfo[] {
@@ -21,6 +33,28 @@ const serverDb = {
   getServerInfo(serverId: string): McServerInfo | null {
     const row = db.prepare("SELECT * FROM servers WHERE id = ?").get(serverId) as McServerInfo
     return row ? row : null
+  },
+
+  createServer(info: McServerInfo): McServerInfo {
+    const createdAt = info.createdAt ?? new Date().toISOString()
+    db.prepare(
+      "INSERT INTO servers (id, name, jarPath, minMem, maxMem, jvmArgs, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    ).run(
+      info.id,
+      info.name,
+      info.jarPath,
+      info.minMem ?? "1024M",
+      info.maxMem ?? "4096M",
+      info.jvmArgs ?? "",
+      createdAt
+    )
+    return {
+      ...info,
+      minMem: info.minMem ?? "1024M",
+      maxMem: info.maxMem ?? "4096M",
+      jvmArgs: info.jvmArgs ?? "",
+      createdAt
+    }
   }
 }
 
