@@ -7,6 +7,19 @@
   let { data } = $props()
 
   const redirectTo = $derived(data.redirectTo ?? "/")
+
+  let password = $state("")
+  let confirmPassword = $state("")
+  let clientError = $state("")
+
+  function handleSubmit(event: SubmitEvent) {
+    clientError = ""
+
+    if (password !== confirmPassword) {
+      event.preventDefault()
+      clientError = "Passwords do not match."
+    }
+  }
 </script>
 
 <div class="w-full max-w-md">
@@ -15,7 +28,7 @@
       <Card.Title class="text-2xl">Create admin account</Card.Title>
     </Card.Header>
     <Card.Content>
-      <form method="POST" action="/api/auth/setup" class="space-y-4">
+      <form method="POST" action="/api/auth/setup" class="space-y-4" onsubmit={handleSubmit}>
         <input type="hidden" name="redirectTo" value={redirectTo} />
         <div class="space-y-2">
           <Label for="username">Username</Label>
@@ -23,15 +36,31 @@
         </div>
         <div class="space-y-2">
           <Label for="password">Password</Label>
-          <Input id="password" name="password" type="password" autocomplete="new-password" required />
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="new-password"
+            required
+            bind:value={password}
+          />
         </div>
         <div class="space-y-2">
           <Label for="confirmPassword">Confirm password</Label>
-          <Input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" required />
+          <Input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            autocomplete="new-password"
+            required
+            bind:value={confirmPassword}
+          />
         </div>
-        {#if data.errorMessage}
-          <p class="text-sm text-destructive">{data.errorMessage}</p>
+
+        {#if clientError || data.errorMessage}
+          <p class="text-sm text-destructive">{clientError || data.errorMessage}</p>
         {/if}
+
         <Button type="submit" class="w-full">Create account</Button>
       </form>
     </Card.Content>
