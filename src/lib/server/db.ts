@@ -2,8 +2,10 @@ import { DatabaseSync } from "node:sqlite"
 import { appPaths } from "$lib/server/config"
 import { type McServerInfo } from "$lib/types"
 
-const db = new DatabaseSync(appPaths.db)
+export const db = new DatabaseSync(appPaths.db)
 db.exec(`
+  PRAGMA foreign_keys = ON;
+
   CREATE TABLE IF NOT EXISTS servers (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -12,6 +14,23 @@ db.exec(`
     maxMem TEXT NOT NULL DEFAULT '4096M',
     jvmArgs TEXT NOT NULL DEFAULT '',
     createdAt TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    passwordHash TEXT NOT NULL,
+    createdAt TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS sessions (
+    id TEXT PRIMARY KEY,
+    userId TEXT NOT NULL,
+    tokenHash TEXT NOT NULL UNIQUE,
+    createdAt TEXT NOT NULL,
+    expiresAt TEXT NOT NULL,
+    lastUsedAt TEXT NOT NULL,
+    FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
   )
 `)
 try {
