@@ -104,7 +104,18 @@ export const POST: RequestHandler = async ({ request }) => {
     jarPath,
     minMem: minMem && minMem.trim().length > 0 ? minMem.trim() : "1024M",
     maxMem: maxMem && maxMem.trim().length > 0 ? maxMem.trim() : "4096M",
-    jvmArgs: jvmArgs?.trim() ?? ""
+    jvmArgs: jvmArgs?.trim() ?? "",
+    host: "127.0.0.1",
+    port: normalizedPort,
+    offlineMode: offlineMode ?? false,
+    maxPlayers: normalizedMaxPlayers,
+    motd: motd ?? "A Minecraft Server",
+    pvp: pvp ?? true,
+    seed: seed ?? "",
+    difficulty: difficulty ?? "normal",
+    gamemode: gamemode ?? "survival",
+    allowFlight: allowFlight ?? false,
+    spawnProtection: normalizedSpawnProtection
   })
 
   return json(created, { status: 201 })

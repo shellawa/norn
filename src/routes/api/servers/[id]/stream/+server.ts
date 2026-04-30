@@ -17,13 +17,16 @@ export const POST: RequestHandler = async ({ params }) => {
   return produce(async ({ emit }) => {
     const logHandler = (text: string) => emit("log", text)
     const statusHandler = (status: string) => emit("status", status)
+    const resourceHandler = (resource: unknown) => emit("resource", JSON.stringify(resource))
 
     server.on("log", logHandler)
     server.on("status", statusHandler)
+    server.on("resource", resourceHandler)
 
     return () => {
       server.off("log", logHandler)
       server.off("status", statusHandler)
+      server.off("resource", resourceHandler)
     }
   })
 }

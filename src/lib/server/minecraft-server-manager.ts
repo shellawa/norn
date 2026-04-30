@@ -35,8 +35,15 @@ class MinecraftServerManager {
     return {
       info: { ...server.info },
       status: server.getStatus(),
-      logs: server.getLogs()
+      logs: server.getLogs(),
+      resource: server.getResourceState()
     }
+  }
+
+  syncServerInfo(serverId: string, nextInfo: McServerState["info"]) {
+    const server = this.servers.get(serverId)
+    if (!server) return
+    server.syncInfo(nextInfo)
   }
 }
 

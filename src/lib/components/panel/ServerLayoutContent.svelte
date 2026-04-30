@@ -3,7 +3,7 @@
   import { Button } from "$lib/components/shadcn-svelte/button"
   import { Badge } from "$lib/components/shadcn-svelte/badge"
   import { source, type Source } from "sveltekit-sse"
-  import { McServerStatus, type McServerState } from "$lib/types"
+  import { McServerStatus, type McServerResourceState, type McServerState } from "$lib/types"
   import { serverStatusVariant } from "$lib/utils/server"
   import { onDestroy, setContext, type Snippet } from "svelte"
   import { Play, Square } from "lucide-svelte"
@@ -25,10 +25,15 @@
   const stopStatus = connection.select("status").subscribe((val) => {
     if (val) serverState.status = val as McServerStatus
   })
+  const stopResource = connection.select("resource").subscribe((val) => {
+    if (!val) return
+    serverState.resource = JSON.parse(val) as McServerResourceState
+  })
 
   onDestroy(() => {
     stopLog()
     stopStatus()
+    stopResource()
     connection.close()
   })
 
@@ -46,10 +51,10 @@
     <div>
       <h1 class="text-3xl font-bold tracking-tight">{serverState.info.name}</h1>
       <div class="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-        <span>Current Status:</span>
         <Badge variant={serverStatusVariant(serverState.status)} class="capitalize">
           {serverState.status || "Unknown"}
         </Badge>
+        <span>{serverState.info.host ?? "127.0.0.1"}:{serverState.info.port ?? 25565}</span>
       </div>
     </div>
 

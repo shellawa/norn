@@ -12,6 +12,17 @@ export type McServerInfo = {
   minMem?: string
   maxMem?: string
   jvmArgs?: string
+  host?: string
+  port?: number
+  offlineMode?: boolean
+  maxPlayers?: number
+  motd?: string
+  pvp?: boolean
+  seed?: string
+  difficulty?: "easy" | "normal" | "hard" | "peaceful"
+  gamemode?: "survival" | "creative" | "adventure" | "spectator"
+  allowFlight?: boolean
+  spawnProtection?: number
   createdAt?: string
 }
 
@@ -19,6 +30,22 @@ export type McServerState = {
   info: McServerInfo
   status: McServerStatus
   logs: string[]
+  resource: McServerResourceState
+}
+
+export type McServerResourceSample = {
+  at: number
+  cpuPercent: number | null
+  processRssMb: number | null
+  systemMemoryUsedPercent: number
+  playerCount: number
+  serverDirSizeMb: number | null
+}
+
+export type McServerResourceState = {
+  sample: McServerResourceSample
+  history: McServerResourceSample[]
+  uptimeMs: number
 }
 
 export type FileItem = {

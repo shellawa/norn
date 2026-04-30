@@ -7,5 +7,5 @@ export const load: LayoutServerLoad = async ({ fetch, params }) => {
   if (res.status != 200) error(res.status)
 
   const data = (await res.json()) as McServerState
-  return { serverState: { info: data.info, status: data.status, logs: data.logs } }
+  return { serverState: { info: data.info, status: data.status, logs: data.logs, resource: data.resource } }
 }

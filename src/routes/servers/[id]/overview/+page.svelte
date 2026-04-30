@@ -1,17 +1,28 @@
 <script lang="ts">
   import * as Card from "$lib/components/shadcn-svelte/card"
+  import * as Chart from "$lib/components/shadcn-svelte/chart"
   import type { McServerState } from "$lib/types"
-  import { Users, Cpu, MemoryStick, Clock, Activity, Terminal } from "lucide-svelte"
+  import { Users, Cpu, MemoryStick, Clock, Activity, Terminal, HardDrive } from "lucide-svelte"
+  import { AreaChart } from "layerchart"
   import { getContext } from "svelte"
 
   const serverState = getContext<McServerState>("serverState")
 
-  const mockMetrics = {
-    players: "12 / 20",
-    cpu: "34.2%",
-    ram: "4.2 GB / 8 GB",
-    uptime: "2d 14h 32m"
+  const formatPercent = (value: number | null) => (value == null ? "n/a" : `${value.toFixed(1)}%`)
+  const formatMb = (value: number | null) => (value == null ? "n/a" : `${value.toFixed(0)} MB`)
+  const formatGb = (value: number | null) => (value == null ? "n/a" : `${(value / 1024).toFixed(2)} GB`)
+  const formatUptime = (ms: number) => {
+    const totalSeconds = Math.floor(ms / 1000)
+    const days = Math.floor(totalSeconds / 86_400)
+    const hours = Math.floor((totalSeconds % 86_400) / 3_600)
+    const minutes = Math.floor((totalSeconds % 3_600) / 60)
+    return `${days}d ${hours}h ${minutes}m`
   }
+
+  const chartConfig = {
+    cpu: { label: "CPU %", color: "var(--chart-1)" },
+    rss: { label: "RSS MB", color: "var(--chart-2)" }
+  } satisfies Chart.ChartConfig
 
   let scrollContainer: HTMLDivElement | undefined = $state()
   let isAutoScrollEnabled = true
@@ -45,15 +56,14 @@
   })
 </script>
 
-<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
   <Card.Root>
     <Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
       <Card.Title class="text-sm font-medium">Players Online</Card.Title>
       <Users class="h-4 w-4 text-muted-foreground" />
     </Card.Header>
     <Card.Content>
-      <div class="text-2xl font-bold">{mockMetrics.players}</div>
-      <p class="text-xs text-muted-foreground">+2 in the last hour</p>
+      <div class="text-2xl font-bold">{serverState.resource.sample.playerCount}</div>
     </Card.Content>
   </Card.Root>
 
@@ -63,19 +73,17 @@
       <Cpu class="h-4 w-4 text-muted-foreground" />
     </Card.Header>
     <Card.Content>
-      <div class="text-2xl font-bold">{mockMetrics.cpu}</div>
-      <p class="text-xs text-muted-foreground">Normal load</p>
+      <div class="text-2xl font-bold">{formatPercent(serverState.resource.sample.cpuPercent)}</div>
     </Card.Content>
   </Card.Root>
 
   <Card.Root>
     <Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
-      <Card.Title class="text-sm font-medium">Memory Allocation</Card.Title>
+      <Card.Title class="text-sm font-medium">Memory (RSS)</Card.Title>
       <MemoryStick class="h-4 w-4 text-muted-foreground" />
     </Card.Header>
     <Card.Content>
-      <div class="text-2xl font-bold">{mockMetrics.ram}</div>
-      <p class="text-xs text-muted-foreground">52% utilization</p>
+      <div class="text-2xl font-bold">{formatMb(serverState.resource.sample.processRssMb)}</div>
     </Card.Content>
   </Card.Root>
 
@@ -85,8 +93,17 @@
       <Clock class="h-4 w-4 text-muted-foreground" />
     </Card.Header>
     <Card.Content>
-      <div class="text-2xl font-bold">{mockMetrics.uptime}</div>
-      <p class="text-xs text-muted-foreground">Since last restart</p>
+      <div class="text-2xl font-bold">{formatUptime(serverState.resource.uptimeMs)}</div>
+    </Card.Content>
+  </Card.Root>
+
+  <Card.Root>
+    <Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+      <Card.Title class="text-sm font-medium">Server Directory</Card.Title>
+      <HardDrive class="h-4 w-4 text-muted-foreground" />
+    </Card.Header>
+    <Card.Content>
+      <div class="text-2xl font-bold">{formatGb(serverState.resource.sample.serverDirSizeMb)}</div>
     </Card.Content>
   </Card.Root>
 </div>
@@ -94,23 +111,48 @@
 <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
   <Card.Root class="lg:col-span-4">
     <Card.Header>
-      <Card.Title>Graph thingy</Card.Title>
-      <Card.Description>Lorem ipsum dolor sit amet, consectetur adipisicing.</Card.Description>
+      <Card.Title>Resource History</Card.Title>
     </Card.Header>
     <Card.Content>
-      <div class="flex h-62.5 w-full items-center justify-center rounded-md border border-dashed bg-muted/30">
-        <div class="flex flex-col items-center text-muted-foreground">
-          <Activity class="mb-2 h-8 w-8 opacity-50" />
-          <span class="text-sm">Graph goes here</span>
+      {@const cutoff = Date.now() - 90000}
+      {@const chartData = serverState.resource.history
+        .filter((x) => x.at >= cutoff)
+        .map((x) => ({
+          at: `-${Math.max(0, Math.floor((Date.now() - x.at) / 1000))}s`,
+          cpu: x.cpuPercent ?? 0,
+          rss: x.processRssMb ?? 0
+        }))}
+      {#if chartData.length}
+        <div class="space-y-3">
+          <Chart.Container config={chartConfig} class="hide-x-axis h-30 w-full">
+            <AreaChart
+              data={chartData}
+              x="at"
+              series={[{ key: "cpu", label: "CPU %", value: "cpu", color: "var(--color-cpu)" }]}
+            />
+          </Chart.Container>
+          <Chart.Container config={chartConfig} class="hide-x-axis h-30 w-full">
+            <AreaChart
+              data={chartData}
+              x="at"
+              series={[{ key: "rss", label: "RSS MB", value: "rss", color: "var(--color-rss)" }]}
+            />
+          </Chart.Container>
         </div>
-      </div>
+      {:else}
+        <div class="flex h-62.5 w-full items-center justify-center rounded-md border border-dashed bg-muted/30">
+          <div class="flex flex-col items-center text-muted-foreground">
+            <Activity class="mb-2 h-8 w-8 opacity-50" />
+            <span class="text-sm">Waiting for first resource samples...</span>
+          </div>
+        </div>
+      {/if}
     </Card.Content>
   </Card.Root>
 
   <Card.Root class="lg:col-span-3">
     <Card.Header>
       <Card.Title>Logs</Card.Title>
-      <Card.Description>Lorem ipsum dolor sit amet, consectetur adipisicing.</Card.Description>
     </Card.Header>
     <Card.Content>
       <div class="flex h-62.5 flex-col rounded-md bg-background p-4 shadow-inner">
@@ -133,3 +175,9 @@
     </Card.Content>
   </Card.Root>
 </div>
+
+<style>
+  :global(.hide-x-axis .lc-axis.placement-bottom .lc-axis-tick-label) {
+    display: none;
+  }
+</style>
