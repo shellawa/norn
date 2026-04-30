@@ -6,6 +6,7 @@ import { mkdir, writeFile } from "node:fs/promises"
 import { appPaths } from "$lib/server/config"
 import { getProvider } from "$lib/server/providers/registry"
 import { serverDb } from "$lib/server/db"
+import { ensureJava } from "$lib/server/utils/java"
 
 export const GET: RequestHandler = async () => {
   return json(minecraftServerManager.listServers())
@@ -20,6 +21,7 @@ export const POST: RequestHandler = async ({ request }) => {
     build,
     minMem,
     maxMem,
+    javaVersion,
     jvmArgs,
     port,
     offlineMode,
@@ -39,6 +41,7 @@ export const POST: RequestHandler = async ({ request }) => {
     build?: string
     minMem?: string
     maxMem?: string
+    javaVersion?: number
     jvmArgs?: string
     port?: number
     offlineMode?: boolean
@@ -97,6 +100,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const jarData = Buffer.from(await jarRes.arrayBuffer())
   await writeFile(jarPath, jarData)
+  await ensureJava(javaVersion)
 
   const created = serverDb.createServer({
     id,
@@ -104,6 +108,7 @@ export const POST: RequestHandler = async ({ request }) => {
     jarPath,
     minMem: minMem && minMem.trim().length > 0 ? minMem.trim() : "1024M",
     maxMem: maxMem && maxMem.trim().length > 0 ? maxMem.trim() : "4096M",
+    javaVersion: javaVersion ?? 25,
     jvmArgs: jvmArgs?.trim() ?? "",
     host: "127.0.0.1",
     port: normalizedPort,

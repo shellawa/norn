@@ -29,6 +29,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
     minMem?: string
     maxMem?: string
     jvmArgs?: string
+    javaVersion?: number
     host?: string
     port?: number
     offlineMode?: boolean
@@ -46,6 +47,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
     name: body.name?.trim() || undefined,
     minMem: body.minMem?.trim() || undefined,
     maxMem: body.maxMem?.trim() || undefined,
+    javaVersion: Number.isInteger(body.javaVersion) ? body.javaVersion : undefined,
     jvmArgs: body.jvmArgs?.trim() ?? undefined,
     host: body.host?.trim() || undefined,
     port: Number.isInteger(body.port) ? body.port : undefined,

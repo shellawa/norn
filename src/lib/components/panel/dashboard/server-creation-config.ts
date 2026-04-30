@@ -24,7 +24,7 @@ export const createDefaultServerForm = () => ({
   providerId: "",
   version: "",
   build: "",
-  javaVersion: "21",
+  javaVersion: "25",
   minMem: "1024M",
   maxMem: "4096M",
   jvmTemplate: "g1gc",

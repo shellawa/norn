@@ -12,6 +12,7 @@ export type McServerInfo = {
   minMem?: string
   maxMem?: string
   jvmArgs?: string
+  javaVersion?: number
   host?: string
   port?: number
   offlineMode?: boolean

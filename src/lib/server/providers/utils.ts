@@ -10,8 +10,8 @@ export function guessJavaVersion(mcVersion: string, type: string): number {
   const parts = mcVersion.split(".").map(Number)
   const major = parts[0]
 
-  if (major >= 26) return 21
-  if (major !== 1) return 21
+  if (major >= 26) return 25
+  if (major !== 1) return 25
 
   const minor = parts[1] ?? 0
   const patch = parts[2] ?? 0

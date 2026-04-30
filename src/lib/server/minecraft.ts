@@ -7,6 +7,7 @@ import os from "node:os"
 import { readFile } from "node:fs/promises"
 import { queryMinecraftStatus } from "./utils/minecraft-status"
 import { calculateDirSize, getProcessUsage } from "./utils/resource"
+import { ensureJava } from "./utils/java"
 
 class MinecraftServer extends EventEmitter {
   readonly info: McServerInfo
@@ -30,20 +31,22 @@ class MinecraftServer extends EventEmitter {
     this.info = info
   }
 
-  start() {
+  async start() {
     if (this.status != McServerStatus.Stopped) return
 
     this.status = McServerStatus.Starting
     this.emit("status", this.status)
 
     const serverPath = path.join(appPaths.servers, this.info.id)
+
+    const javaPath = await ensureJava(this.info.javaVersion)
     const memoryArgs = [`-Xms${this.info.minMem ?? "1024M"}`, `-Xmx${this.info.maxMem ?? "4096M"}`]
     const extraJvmArgs = (this.info.jvmArgs ?? "")
       .trim()
       .split(/\s+/)
       .filter((x) => x.length > 0)
     const javaArgs = [...memoryArgs, ...extraJvmArgs, "-jar", this.info.jarPath, "nogui"]
-    this.process = spawn("java", javaArgs, { cwd: serverPath })
+    this.process = spawn(javaPath, javaArgs, { cwd: serverPath })
 
     this.process.stdout.on("data", this.pushLog)
     this.process.stderr.on("data", this.pushLog)

@@ -20,6 +20,7 @@
     port: serverState.info.port ?? 25565,
     minMem: serverState.info.minMem ?? "1024M",
     maxMem: serverState.info.maxMem ?? "4096M",
+    javaVersion: serverState.info.javaVersion ?? 25,
     jvmArgs: serverState.info.jvmArgs ?? "",
     maxPlayers: serverState.info.maxPlayers ?? 20,
     motd: serverState.info.motd ?? "A Minecraft Server",
@@ -86,6 +87,10 @@
       <div class="space-y-2">
         <Label for="maxMem">Max Memory</Label>
         <Input id="maxMem" bind:value={form.maxMem} />
+      </div>
+      <div class="space-y-2 md:col-span-2">
+        <Label for="javaVersion">Java Version</Label>
+        <Input id="javaVersion" type="number" bind:value={form.javaVersion} />
       </div>
       <div class="space-y-2 md:col-span-2">
         <Label for="jvmArgs">JVM Args</Label>

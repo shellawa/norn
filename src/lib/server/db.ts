@@ -12,6 +12,7 @@ db.exec(`
     jarPath TEXT NOT NULL,
     minMem TEXT NOT NULL DEFAULT '1024M',
     maxMem TEXT NOT NULL DEFAULT '4096M',
+    javaVersion INTEGER NOT NULL DEFAULT 25,
     jvmArgs TEXT NOT NULL DEFAULT '',
     host TEXT NOT NULL DEFAULT '127.0.0.1',
     port INTEGER NOT NULL DEFAULT 25565,
@@ -51,6 +52,7 @@ const toInfo = (row: Record<string, unknown>): McServerInfo => ({
   jarPath: String(row.jarPath ?? ""),
   minMem: String(row.minMem ?? "1024M"),
   maxMem: String(row.maxMem ?? "4096M"),
+  javaVersion: Number(row.javaVersion ?? 25),
   jvmArgs: String(row.jvmArgs ?? ""),
   host: String(row.host ?? "127.0.0.1"),
   port: Number(row.port ?? 25565),
@@ -80,13 +82,14 @@ const serverDb = {
   createServer(info: McServerInfo): McServerInfo {
     const createdAt = info.createdAt ?? new Date().toISOString()
     db.prepare(
-      "INSERT INTO servers (id, name, jarPath, minMem, maxMem, jvmArgs, host, port, offlineMode, maxPlayers, motd, pvp, seed, difficulty, gamemode, allowFlight, spawnProtection, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+      "INSERT INTO servers (id, name, jarPath, minMem, maxMem, javaVersion, jvmArgs, host, port, offlineMode, maxPlayers, motd, pvp, seed, difficulty, gamemode, allowFlight, spawnProtection, createdAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
     ).run(
       info.id,
       info.name,
       info.jarPath,
       info.minMem ?? "1024M",
       info.maxMem ?? "4096M",
+      info.javaVersion ?? 25,
       info.jvmArgs ?? "",
       info.host ?? "127.0.0.1",
       info.port ?? 25565,
@@ -105,6 +108,7 @@ const serverDb = {
       ...info,
       minMem: info.minMem ?? "1024M",
       maxMem: info.maxMem ?? "4096M",
+      javaVersion: info.javaVersion ?? 25,
       jvmArgs: info.jvmArgs ?? "",
       host: info.host ?? "127.0.0.1",
       port: info.port ?? 25565,
@@ -134,11 +138,12 @@ const serverDb = {
     }
 
     db.prepare(
-      "UPDATE servers SET name = ?, minMem = ?, maxMem = ?, jvmArgs = ?, host = ?, port = ?, offlineMode = ?, maxPlayers = ?, motd = ?, pvp = ?, seed = ?, difficulty = ?, gamemode = ?, allowFlight = ?, spawnProtection = ? WHERE id = ?"
+      "UPDATE servers SET name = ?, minMem = ?, maxMem = ?, javaVersion = ?, jvmArgs = ?, host = ?, port = ?, offlineMode = ?, maxPlayers = ?, motd = ?, pvp = ?, seed = ?, difficulty = ?, gamemode = ?, allowFlight = ?, spawnProtection = ? WHERE id = ?"
     ).run(
       next.name,
       next.minMem ?? "1024M",
       next.maxMem ?? "4096M",
+      next.javaVersion ?? 25,
       next.jvmArgs ?? "",
       next.host ?? "127.0.0.1",
       next.port ?? 25565,

@@ -10,6 +10,6 @@ export const GET: RequestHandler = async ({ params }) => {
     return json({ error: `Unknown server: ${serverId}` }, { status: 404 })
   }
 
-  instance.start()
+  await instance.start()
   return json({ status: "ok" })
 }
