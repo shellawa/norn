@@ -1,4 +1,4 @@
-import { execFile, spawn, type ChildProcessWithoutNullStreams } from "node:child_process"
+import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process"
 import EventEmitter from "node:events"
 import { type McServerInfo, type McServerResourceSample, type McServerResourceState, McServerStatus } from "$lib/types"
 import path from "node:path"
@@ -6,6 +6,7 @@ import { appPaths } from "./config"
 import os from "node:os"
 import { readFile } from "node:fs/promises"
 import { queryMinecraftStatus } from "./utils/minecraft-status"
+import { calculateDirSize, getProcessUsage } from "./utils/resource"
 
 class MinecraftServer extends EventEmitter {
   readonly info: McServerInfo
@@ -15,6 +16,8 @@ class MinecraftServer extends EventEmitter {
   private readonly MAX_LOGS_LENGTH = 1000
   private readonly MAX_RESOURCE_HISTORY = 45
   private readonly RESOURCE_SAMPLE_INTERVAL_MS = 2_000
+  private readonly DIR_SIZE_INTERVAL_MS = 300_000
+  private lastDirSizeCheckAt = 0
   private resourceHistory: McServerResourceSample[] = []
   private sampler: ReturnType<typeof setInterval> | null = null
   private startAt: number | null = null
@@ -114,17 +117,16 @@ class MinecraftServer extends EventEmitter {
   }
 
   private async queryServerDirSize() {
+    const now = Date.now()
+
+    if (now - this.lastDirSizeCheckAt < this.DIR_SIZE_INTERVAL_MS) {
+      return
+    }
+    this.lastDirSizeCheckAt = now
     try {
       const serverPath = path.dirname(this.info.jarPath)
-      const sizeKb = await new Promise<number>((resolve, reject) => {
-        execFile("du", ["-sk", serverPath], (error, stdout) => {
-          if (error) return reject(error)
-          const kb = Number.parseInt(stdout.trim().split(/\s+/)[0] ?? "", 10)
-          if (!Number.isFinite(kb)) return reject(new Error("Invalid du output"))
-          resolve(kb)
-        })
-      })
-      this.serverDirSizeMb = Number((sizeKb / 1024).toFixed(2))
+      const sizeBytes = await calculateDirSize(serverPath)
+      this.serverDirSizeMb = Number((sizeBytes / (1024 * 1024)).toFixed(2))
     } catch {
       this.serverDirSizeMb = this.serverDirSizeMb ?? null
     }
@@ -142,9 +144,10 @@ class MinecraftServer extends EventEmitter {
     this.sampler = null
   }
 
-  private collectResourceSample() {
+  private async collectResourceSample() {
     const uptimeMs = this.startAt ? Date.now() - this.startAt : 0
     const memoryUsedPercent = ((os.totalmem() - os.freemem()) / os.totalmem()) * 100
+
     const fallbackSample: McServerResourceSample = {
       at: Date.now(),
       cpuPercent: null,
@@ -160,19 +163,8 @@ class MinecraftServer extends EventEmitter {
       return
     }
 
-    execFile("ps", ["-p", `${this.process.pid}`, "-o", "%cpu=,rss="], (error, stdout) => {
-      if (error) {
-        this.pushResourceSample(fallbackSample)
-        this.emit("resource", this.getResourceState(uptimeMs))
-        return
-      }
-
-      const parts = stdout
-        .trim()
-        .split(/\s+/)
-        .filter((x) => x.length > 0)
-      const cpu = Number.parseFloat(parts[0] ?? "")
-      const rssKb = Number.parseInt(parts[1] ?? "", 10)
+    try {
+      const { cpu, rssKb } = await getProcessUsage(this.process.pid)
 
       const sample: McServerResourceSample = {
         at: Date.now(),
@@ -185,7 +177,10 @@ class MinecraftServer extends EventEmitter {
 
       this.pushResourceSample(sample)
       this.emit("resource", this.getResourceState(uptimeMs))
-    })
+    } catch (error) {
+      this.pushResourceSample(fallbackSample)
+      this.emit("resource", this.getResourceState(uptimeMs))
+    }
 
     void this.queryPlayersViaStatus()
     void this.queryServerDirSize()
