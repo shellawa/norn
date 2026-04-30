@@ -37,7 +37,7 @@ export class VanillaProvider implements ServerProvider {
     return ["release"]
   }
 
-  async getDownloadUrl(version: string, build: string): Promise<string> {
+  async getDownloadUrl(version: string, build: string): Promise<[string, string][]> {
     const manifest = await fetchJson<ManifestResponse>(MANIFEST)
     const entry = manifest.versions.find((v) => v.id === version)
 
@@ -48,6 +48,6 @@ export class VanillaProvider implements ServerProvider {
 
     if (!url) throw new Error("No server jar")
 
-    return url
+    return [[url, "server.jar"]]
   }
 }

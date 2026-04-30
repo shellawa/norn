@@ -42,12 +42,12 @@ export class FabricProvider implements ServerProvider {
     return loaders.map((l) => l.loader.version)
   }
 
-  async getDownloadUrl(version: string, build: string): Promise<string> {
+  async getDownloadUrl(version: string, build: string): Promise<[string, string][]> {
     const installers = await fetchJson<FabricInstallerVersion[]>(`${META}/versions/installer`)
     const installer = installers.find((i) => i.stable)?.version ?? installers[0]?.version
 
     if (!installer) throw new Error("No Fabric installer found")
 
-    return `${META}/versions/loader/${encodeURIComponent(version)}/${build}/${installer}/server/jar`
+    return [[`${META}/versions/loader/${encodeURIComponent(version)}/${build}/${installer}/server/jar`, "server.jar"]]
   }
 }

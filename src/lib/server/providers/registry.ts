@@ -13,7 +13,7 @@ export const providers: ServerProvider[] = [
   new FoliaProvider(),
   new PurpurProvider(),
   new FabricProvider(),
-  new ForgeProvider(),
+  // new ForgeProvider(), // forge is a mess right now and I don't have time to suppor it.
   new NeoForgeProvider()
 ]
 

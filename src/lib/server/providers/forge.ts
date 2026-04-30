@@ -42,7 +42,36 @@ export class ForgeProvider implements ServerProvider {
     return builds
   }
 
-  async getDownloadUrl(version: string, build: string): Promise<string> {
-    return `${MAVEN}/${version}-${build}/forge-${version}-${build}-installer.jar`
+  async getDownloadUrl(version: string, build: string): Promise<[string, string][]> {
+    const major = Number(version.split(".")[0])
+
+    if (major >= 17) {
+      return [
+        ["https://github.com/neoforged/ServerStarterJar/releases/download/0.1.34/server.jar", "server.jar"],
+        [`${MAVEN}/${version}-${build}/forge-${version}-${build}-installer.jar`, "forge-installer.jar"]
+      ]
+    }
+
+    return [
+      // old installer variants
+      [`${MAVEN}/${version}-${build}/forge-${version}-${build}-installer.jar`, "installer.jar"],
+      [`${MAVEN}/${version}-${build}-${version}/forge-${version}-${build}-${version}-installer.jar`, "installer.jar"],
+      [
+        `${MAVEN}/${version}-${build}-${version}.0/forge-${version}-${build}-${version}.0-installer.jar`,
+        "installer.jar"
+      ],
+      [`${MAVEN}/${version}-${build}-mc172/forge-${version}-${build}-mc172-installer.jar`, "installer.jar"]
+    ]
+  }
+
+  install(version: string): string[] {
+    const major = Number(version.split(".")[0])
+    if (major >= 17) return []
+
+    return [
+      "java -jar installer.jar --installServer || true",
+      "mv forge-*.jar server.jar || true",
+      "rm -f installer.jar installer.jar.log"
+    ]
   }
 }

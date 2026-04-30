@@ -7,6 +7,7 @@ import { appPaths } from "$lib/server/config"
 import { getProvider } from "$lib/server/providers/registry"
 import { serverDb } from "$lib/server/db"
 import { ensureJava } from "$lib/server/utils/java"
+import { execSync } from "node:child_process"
 
 export const GET: RequestHandler = async () => {
   return json(minecraftServerManager.listServers())
@@ -92,15 +93,43 @@ export const POST: RequestHandler = async ({ request }) => {
   ].join("\n")
   await writeFile(path.join(serverPath, "server.properties"), `${propertiesText}\n`, "utf8")
 
-  const downloadUrl = await provider.getDownloadUrl(version, build)
-  const jarRes = await fetch(downloadUrl)
-  if (!jarRes.ok) {
-    return json({ error: `Failed to download server jar: ${jarRes.status}` }, { status: 502 })
+  const downloadUrls = await provider.getDownloadUrl(version, build)
+
+  const grouped = new Map<string, string[]>()
+
+  for (const [url, name] of downloadUrls) {
+    if (!grouped.has(name)) grouped.set(name, [])
+    grouped.get(name)!.push(url)
   }
 
-  const jarData = Buffer.from(await jarRes.arrayBuffer())
-  await writeFile(jarPath, jarData)
-  await ensureJava(javaVersion)
+  for (const [name, urls] of grouped) {
+    let success = false
+
+    for (const url of urls) {
+      const res = await fetch(url)
+      if (!res.ok) continue
+
+      const data = Buffer.from(await res.arrayBuffer())
+      await writeFile(path.join(serverPath, name), data)
+
+      success = true
+      break
+    }
+
+    if (!success) {
+      return json({ error: `Failed to download ${name}` }, { status: 502 })
+    }
+  }
+
+  const java = await ensureJava(javaVersion)
+
+  if (provider.install) {
+    const installCmds = provider.install(version, build)
+    for (const cmd of installCmds) {
+      if (cmd.startsWith("java")) execSync(java + cmd.slice(4), { cwd: serverPath })
+      else execSync(cmd, { cwd: serverPath })
+    }
+  }
 
   const created = serverDb.createServer({
     id,

@@ -35,7 +35,7 @@ export class PurpurProvider implements ServerProvider {
     return data.builds.all.reverse()
   }
 
-  async getDownloadUrl(version: string, build: string): Promise<string> {
-    return `${BASE}/${version}/${build}/download`
+  async getDownloadUrl(version: string, build: string): Promise<[string, string][]> {
+    return [[`${BASE}/${version}/${build}/download`, "server.jar"]]
   }
 }

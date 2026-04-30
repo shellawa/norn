@@ -10,5 +10,6 @@ export interface ServerProvider {
 
   getVersions(): Promise<Version[]>
   getBuilds(version: string): Promise<string[]>
-  getDownloadUrl(version: string, build: string): Promise<string>
+  getDownloadUrl(version: string, build: string): Promise<[string, string][]>
+  install?(version: string, build: string): string[]
 }

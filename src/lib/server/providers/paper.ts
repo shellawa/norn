@@ -61,7 +61,7 @@ export class PaperProvider implements ServerProvider {
     return data.slice().map((b) => String(b.id))
   }
 
-  async getDownloadUrl(version: string, build: string): Promise<string> {
+  async getDownloadUrl(version: string, build: string): Promise<[string, string][]> {
     const builds = await fetchJson<BuildApiResponse>(
       `${FILL_BASE}/projects/${this.project}/versions/${encodeURIComponent(version)}/builds`,
       { headers: this.headers }
@@ -78,7 +78,7 @@ export class PaperProvider implements ServerProvider {
     const url = target.downloads?.["server:default"]?.url
     if (!url) throw new Error(`No download URL in build ${target.id}`)
 
-    return url
+    return [[url, "server.jar"]]
   }
 }
 

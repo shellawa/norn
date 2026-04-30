@@ -155,7 +155,7 @@
         headers: { "content-type": "application/json" },
         body: JSON.stringify(payload)
       })
-      creatingStatus = "Downloading and creating server...(This can take a while)"
+      creatingStatus = "Downloading and creating server...(The dialog might appear freeze)"
       const res = await req
       if (!res.ok) {
         const payload = (await res.json().catch(() => ({}))) as { error?: string }

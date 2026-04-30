@@ -88,7 +88,10 @@ export class NeoForgeProvider implements ServerProvider {
       .sort((a, b) => sortVersionsDesc(cleanVersion(a), cleanVersion(b)))
   }
 
-  async getDownloadUrl(version: string, build: string): Promise<string> {
-    return `${BASE}/${build}/neoforge-${build}-installer.jar`
+  async getDownloadUrl(version: string, build: string): Promise<[string, string][]> {
+    return [
+      ["https://github.com/neoforged/ServerStarterJar/releases/download/0.1.34/server.jar", "server.jar"],
+      [`${BASE}/${build}/neoforge-${build}-installer.jar`, "neoforge-installer.jar"]
+    ]
   }
 }
