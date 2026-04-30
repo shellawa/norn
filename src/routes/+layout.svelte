@@ -1,6 +1,6 @@
 <script lang="ts">
   import "./layout.css"
-  import favicon from "$lib/assets/favicon.svg"
+  import favicon from "$lib/assets/favicon.ico"
 
   import * as Sidebar from "$lib/components/shadcn-svelte/sidebar/index.js"
   import AppSidebar from "$lib/components/shadcn-svelte/app-sidebar.svelte"
