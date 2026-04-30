@@ -10,6 +10,10 @@
 
 </script>
 
+<svelte:head>
+  <title>Dashboard - Norn</title>
+</svelte:head>
+
 <main class="mx-auto w-full max-w-7xl space-y-6 px-6 py-6">
   <div class="flex flex-col gap-4 border-b pb-6 md:flex-row md:items-end md:justify-between">
     <h1 class="text-3xl font-semibold tracking-tight">Dashboard</h1>

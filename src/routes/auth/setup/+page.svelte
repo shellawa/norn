@@ -22,6 +22,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Set Up - Norn</title>
+</svelte:head>
+
 <div class="w-full max-w-md">
   <Card.Root class="border-border/60 bg-card/95 shadow-2xl shadow-slate-900/10 backdrop-blur">
     <Card.Header>

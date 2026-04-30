@@ -9,6 +9,10 @@
   const redirectTo = $derived(data.redirectTo ?? "/")
 </script>
 
+<svelte:head>
+  <title>Sign In - Norn</title>
+</svelte:head>
+
 <div class="w-full max-w-md">
   <Card.Root class="border-border/60 bg-card/95 shadow-2xl shadow-slate-900/10 backdrop-blur">
     <Card.Header>

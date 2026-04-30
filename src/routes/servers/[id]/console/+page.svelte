@@ -50,6 +50,10 @@
   })
 </script>
 
+<svelte:head>
+  <title>Console - {serverState.info.name}</title>
+</svelte:head>
+
 <Card.Root class="flex flex-col gap-0 overflow-hidden border bg-transparent pt-4 pb-3">
   <Card.Content class="p-0">
     <div

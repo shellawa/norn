@@ -58,6 +58,10 @@
   }
 </script>
 
+<svelte:head>
+  <title>Config - {serverState.info.name}</title>
+</svelte:head>
+
 <Card.Root>
   <Card.Header>
     <Card.Title>Configuration</Card.Title>

@@ -7,13 +7,16 @@
 
   import { goto, invalidateAll } from "$app/navigation"
   import { page } from "$app/state"
-  import type { FileItem, FileManagerDialogState } from "$lib/types"
+  import type { FileItem, FileManagerDialogState, McServerState } from "$lib/types"
 
   import FileTable from "$lib/components/panel/file-manager/FileTable.svelte"
   import FileManagerDialogs from "$lib/components/panel/file-manager/FileManagerDialogs.svelte"
   import { isLikelyTextFile, triggerDownload } from "$lib/utils/file"
+  import { getContext } from "svelte"
 
   let { data } = $props()
+
+  const serverState = getContext<McServerState>("serverState")
 
   let ui = $state({
     searchQuery: "",
@@ -106,6 +109,10 @@
     invalidateAll()
   }
 </script>
+
+<svelte:head>
+  <title>File - {serverState.info.name}</title>
+</svelte:head>
 
 <div class="space-y-4">
   <input type="file" bind:this={fileInput} class="hidden" onchange={handleUpload} />
