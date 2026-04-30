@@ -5,6 +5,7 @@
   import { Users, Cpu, MemoryStick, Clock, Activity, Terminal, HardDrive } from "lucide-svelte"
   import { AreaChart } from "layerchart"
   import { getContext } from "svelte"
+  import { AnsiUp } from "ansi_up"
 
   const serverState = getContext<McServerState>("serverState")
 
@@ -23,6 +24,8 @@
     cpu: { label: "CPU %", color: "var(--chart-1)" },
     rss: { label: "RSS MB", color: "var(--chart-2)" }
   } satisfies Chart.ChartConfig
+
+  const ansiUp = new AnsiUp()
 
   let scrollContainer: HTMLDivElement | undefined = $state()
   let isAutoScrollEnabled = true
@@ -163,7 +166,7 @@
         >
           {#if serverState.logs.length}
             {#each serverState.logs as line}
-              <div class="wrap-break-word">{line}</div>
+              <div class="wrap-break-word whitespace-pre-wrap">{@html ansiUp.ansi_to_html(line)}</div>
             {/each}
           {:else}
             <div class="flex h-full items-center justify-center text-muted">

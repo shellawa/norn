@@ -14,6 +14,12 @@ importers:
       '@types/node':
         specifier: ^25.6.0
         version: 25.6.0
+      ansi_up:
+        specifier: ^6.0.6
+        version: 6.0.6
+      layerchart:
+        specifier: 2.0.0-next.48
+        version: 2.0.0-next.48(@sveltejs/kit@2.57.1(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.55.4)(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)))(svelte@5.55.4)(typescript@5.9.3)(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)))(svelte@5.55.4)
       lucide-svelte:
         specifier: ^0.564.0
         version: 0.564.0(svelte@5.55.4)
@@ -45,9 +51,6 @@ importers:
       clsx:
         specifier: 2.1.1
         version: 2.1.1
-      layerchart:
-        specifier: 2.0.0-next.48
-        version: 2.0.0-next.48(@sveltejs/kit@2.57.1(@sveltejs/vite-plugin-svelte@6.2.4(svelte@5.55.4)(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)))(svelte@5.55.4)(typescript@5.9.3)(vite@7.3.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)))(svelte@5.55.4)
       prettier:
         specifier: ^3.8.3
         version: 3.8.3
@@ -679,6 +682,9 @@ packages:
     resolution: {integrity: sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==}
     engines: {node: '>=0.4.0'}
     hasBin: true
+
+  ansi_up@6.0.6:
+    resolution: {integrity: sha512-yIa1x3Ecf8jWP4UWEunNjqNX6gzE4vg2gGz+xqRGY+TBSucnYp6RRdPV4brmtg6bQ1ljD48mZ5iGSEj7QEpRKA==}
 
   aria-query@5.3.1:
     resolution: {integrity: sha512-Z/ZeOgVl7bcSYZ/u/rh0fOpvEpq//LZmdbkXyc7syVzjPAhfOa9ebsdTSjEBDU4vs5nC98Kfduj1uFo0qyET3g==}
@@ -1810,6 +1816,8 @@ snapshots:
   '@types/trusted-types@2.0.7': {}
 
   acorn@8.16.0: {}
+
+  ansi_up@6.0.6: {}
 
   aria-query@5.3.1: {}
 

@@ -81,6 +81,7 @@ class MinecraftServer extends EventEmitter {
   sendCommand(cmd: string) {
     if (this.process) {
       this.process.stdin.write(`${cmd}\n`)
+      this.pushLog(Buffer.from("/" + cmd))
     }
   }
 

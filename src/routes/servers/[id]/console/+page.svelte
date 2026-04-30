@@ -3,6 +3,9 @@
   import type { McServerState } from "$lib/types"
   import { Terminal } from "lucide-svelte"
   import { getContext } from "svelte"
+  import { AnsiUp } from "ansi_up"
+
+  const ansiUp = new AnsiUp()
 
   let commandInput = $state("")
   const serverState = getContext<McServerState>("serverState")
@@ -56,7 +59,7 @@
     >
       {#if serverState.logs.length}
         {#each serverState.logs as line}
-          <div class="wrap-break-word">{line}</div>
+          <div class="wrap-break-word whitespace-pre-wrap">{@html ansiUp.ansi_to_html(line)}</div>
         {/each}
       {:else}
         <div class="flex h-full items-center justify-center">
