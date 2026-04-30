@@ -1,42 +1,80 @@
-# sv
+# Norn
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Norn is a lightweight Minecraft server management panel built with SvelteKit, pnpm, and Node.Js.
 
-## Creating a project
+## Installation
 
-If you're seeing this, you've probably already done this step. Congrats!
+### Docker
 
-```sh
-# create a new project
-npx sv create my-app
+Build the image:
+
+```bash
+docker build -t norn .
 ```
 
-To recreate this project with the same configuration:
+Run the container:
 
-```sh
-# recreate this project
-pnpm dlx sv create --template minimal --types ts --add prettier tailwindcss="plugins:none" devtools-json --install pnpm .
+```bash
+docker run \
+  -p 3000:3000 \
+  -p 25565-25600:25565-25600 \
+  norn
 ```
 
-## Developing
+Windows PowerShell:
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+```powershell
+docker run `
+  -p 3000:3000 `
+  -p 25565-25600:25565-25600 `
+  norn
 ```
 
-## Building
+---
 
-To create a production version of your app:
+### Manual Installation
 
-```sh
-npm run build
+#### Requirements
+
+- Node.Js 24 or newer
+- pnpm
+- git
+
+---
+
+Clone the repository:
+
+```bash
+git clone https://github.com/shellawa/norn
+cd norn
 ```
 
-You can preview the production build with `npm run preview`.
+---
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Running Norn
+
+### Unix / Linux / macOS
+
+Run:
+
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+### Windows
+
+Run:
+
+```bat
+start.bat
+```
+
+---
+
+### Ports
+
+- `3000`: Web panel
+- `25565-25600` (docker): Minecraft server port
+
+Adjust mappings as needed for your deployment.
