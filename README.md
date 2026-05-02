@@ -1,48 +1,27 @@
 # Norn
 
-Norn is a lightweight Minecraft server management panel built with SvelteKit, pnpm, and Node.Js.
+Norn is a lightweight Minecraft server management panel.
+
+## Feature
+
+- Manage multiple servers on the same machine.
+- Automatic installation of popular server providers, including Vanilla, Paper, Purpur, Fabric, NeoForge, ~~Forge~~ (disabled due to inconsistent naming).
+- Monitor players and resource stats from the panel.
+- View logs and running console commands.
+- File manager with text editor.
+- Configuration page for things that I think are important.
 
 ## Installation
 
-### Docker
+### Requirements
 
-Build the image:
-
-```bash
-docker build -t norn .
-```
-
-Run the container:
-
-```bash
-docker run \
-  -p 3000:3000 \
-  -p 25565-25600:25565-25600 \
-  norn
-```
-
-Windows PowerShell:
-
-```powershell
-docker run `
-  -p 3000:3000 `
-  -p 25565-25600:25565-25600 `
-  norn
-```
-
----
-
-### Manual Installation
-
-#### Requirements
-
-- Node.Js 24 or newer
-- pnpm
 - git
+- Node.js 24 or newer
+- pnpm
 
 ---
 
-Clone the repository:
+### Clone the Repository
 
 ```bash
 git clone https://github.com/shellawa/norn
@@ -51,11 +30,25 @@ cd norn
 
 ---
 
-## Running Norn
+## Running with Docker
+
+### Build the Image
+
+```bash
+docker build -t norn .
+```
+
+### Run the Container
+
+```bash
+docker run -p 3000:3000 -p 25565-25600:25565-25600 norn
+```
+
+---
+
+## Running Manually
 
 ### Unix / Linux / macOS
-
-Run:
 
 ```bash
 chmod +x start.sh
@@ -64,17 +57,15 @@ chmod +x start.sh
 
 ### Windows
 
-Run:
-
 ```bat
 start.bat
 ```
 
 ---
 
-### Ports
+## Ports
 
 - `3000`: Web panel
-- `25565-25600` (docker): Minecraft server port
+- `25565-25600` (Docker): Minecraft server ports
 
 Adjust mappings as needed for your deployment.
