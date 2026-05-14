@@ -8,7 +8,7 @@
   const ansiUp = new AnsiUp()
 
   let commandInput = $state("")
-  const serverState = getContext<McServerState>("serverState")
+  const serverState: McServerState = getContext("serverState")
 
   let handleCommand = async () => {
     await fetch(`/api/servers/${encodeURIComponent(serverState.info.id)}/console-command`, {

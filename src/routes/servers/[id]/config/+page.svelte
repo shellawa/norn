@@ -8,11 +8,11 @@
   import type { McServerState } from "$lib/types"
   import { getContext } from "svelte"
 
-  const serverState = getContext<McServerState>("serverState")
+  const serverState: McServerState = getContext("serverState")
 
   let saving = $state(false)
   let saveError = $state("")
-  let savedAt = $state<number | null>(null)
+  let savedAt: number | null = $state(null)
 
   let form = $state({
     name: serverState.info.name,

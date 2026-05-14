@@ -60,6 +60,17 @@ export type FileItem = {
 export type FileManagerDialogState = {
   viewer: { open: boolean; name: string; content: string }
   newFolder: { open: boolean; name: string }
+  newFile: { open: boolean; name: string }
+  rename: { open: boolean; item: FileItem | null; name: string }
+  move: {
+    open: boolean
+    item: FileItem | null
+    browserPath: string
+    selectedFolder: string
+    folders: FileItem[]
+    loading: boolean
+    error: string
+  }
   delete: { open: boolean; item: FileItem | null }
   confirmView: { open: boolean; item: FileItem | null }
 }

@@ -7,7 +7,7 @@
   import { getContext } from "svelte"
   import { AnsiUp } from "ansi_up"
 
-  const serverState = getContext<McServerState>("serverState")
+  const serverState: McServerState = getContext("serverState")
 
   const formatPercent = (value: number | null) => (value == null ? "n/a" : `${value.toFixed(1)}%`)
   const formatMb = (value: number | null) => (value == null ? "n/a" : `${value.toFixed(0)} MB`)

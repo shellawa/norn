@@ -59,5 +59,6 @@ export function setChartContext(value: ChartContextValue) {
 }
 
 export function useChart() {
-  return getContext<ChartContextValue>(chartContextKey)
+  const context: ChartContextValue = getContext(chartContextKey)
+  return context
 }
