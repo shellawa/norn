@@ -20,12 +20,21 @@
   <Sidebar.Provider>
     <AppSidebar servers={data.servers} />
     <div class="h-full w-full space-y-4">
-      <nav class="flex h-6 w-full items-center justify-between border-b px-4 py-6">
-        <Sidebar.Trigger />
-        <div class="flex items-center gap-4 text-sm text-muted-foreground">
-          <span>{data.servers?.length ?? 0} servers</span>
-          <span>{data.user?.username}</span>
-          <a href="/api/auth/logout" class="text-foreground underline-offset-4 hover:underline">Logout</a>
+      <nav class="sticky top-0 z-20 h-14 w-full border-b border-border/80 bg-background/85 px-4 backdrop-blur-sm">
+        <div class="relative flex h-full items-center justify-between">
+          <div class="flex items-center gap-3">
+            <Sidebar.Trigger />
+          </div>
+          <a
+            href="/"
+            class="absolute left-1/2 -translate-x-1/2 rounded-md px-2 py-1 text-sm font-semibold tracking-[0.01em] text-foreground/90 transition-colors hover:bg-accent/50 hover:text-foreground"
+            >Norn</a
+          >
+          <div class="flex items-center gap-4 text-sm text-muted-foreground">
+            <span>{data.servers?.length ?? 0} servers</span>
+            <span>{data.user?.username}</span>
+            <a href="/api/auth/logout" class="text-foreground underline-offset-4 hover:underline">Logout</a>
+          </div>
         </div>
       </nav>
       {@render children?.()}
